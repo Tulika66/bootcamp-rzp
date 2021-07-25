@@ -18,17 +18,17 @@ const (
 
 type Teacher struct{
 	totalRating int64
-	mutex sync.Mutex
+	
 }
 
-func (teacher *Teacher) workerTasks(workerId int,waitGroup *sync.WaitGroup){
-	defer waitGroup.Done()
+func (teacher *Teacher) workerTasks(workerId int){
+	        
 
 		sleepTime:=rand.Intn(sleepTimeLimit)
 		time.Sleep(time.Duration(sleepTime)*time.Second)
 		currentStudentRating:=int64(rand.Intn(maxRating-minRating+1)+minRating)
-        atomic.AddInt64(&teacher.totalRating,currentStudentRating)
-        fmt.Println("Student ID-:",workerId,", Student rating :",currentStudentRating)
+                atomic.AddInt64(&teacher.totalRating,currentStudentRating)
+                fmt.Println("Student ID-:",workerId,", Student rating :",currentStudentRating)
 
 	}
 
@@ -46,14 +46,17 @@ func main() {
 
 
 	for workerId:=0;workerId<numberOfStudents;workerId++{
-		waitGroup.Add(1)
-		go teacher.workerTasks(workerId,&waitGroup)
+		func (){
+			waitGroup.Add(1)
+			defer waitGroup.Done()
+		        go teacher.workerTasks(workerId)
+		}()
 	}
 
 
     waitGroup.Wait()
 
-	time.Sleep(time.Second*5)
+
     fmt.Println("Average Rating:-",float64(float64(teacher.totalRating)/float64(numberOfStudents)))
 
 
