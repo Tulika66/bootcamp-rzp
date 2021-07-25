@@ -10,14 +10,14 @@ import(
 type stringsManager struct {
 	mutex                sync.Mutex
 	frequencyOfAlphabets map[string]int
-	waitGroup            *sync.WaitGroup
+	
 	stringSet            []string
 }
 
 
 func (stringManager *stringsManager)frequencyCalculatorForSet(id int, stringVal string){
 
-	defer stringManager.waitGroup.Done()
+	
 
 	for indexAtString:=0;indexAtString<len(stringVal);indexAtString++{
 
@@ -33,8 +33,8 @@ func (stringManager *stringsManager)frequencyCalculatorForSet(id int, stringVal 
 
 func main() {
 
-	var frequencyOfAlphabets=make(map[string]int,26)
-
+    var frequencyOfAlphabets=make(map[string]int,26)
+	var  waitGroup =sync.WaitGroup{}
     stringset :=[]string{}
     var numOfStrings int=0
 
@@ -58,14 +58,17 @@ func main() {
          mutex:sync.Mutex{},
          stringSet:stringset,
          frequencyOfAlphabets: frequencyOfAlphabets,
-         waitGroup:&sync.WaitGroup{} ,
+         
 	}
 
 
     fmt.Println("current string manager:-",stringManager)
 	for id,stringValue:=range stringManager.stringSet{
+		func (){
 		stringManager.waitGroup.Add(1)
+		defer waitGroup.Done()
 		go stringManager.frequencyCalculatorForSet(id,stringValue)
+		}()
 
 	}
 
