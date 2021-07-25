@@ -23,10 +23,10 @@ func(employee *Employee) WithdrawError(){
 
 func (employee *Employee)withdrawFromAccount(value int64,waitGroup *sync.WaitGroup){
 
-	waitGroup.Add(1)
-	defer waitGroup.Done()
+	
 
-
+        defer waitGroup.Done()
+	
 	if value>employee.bankBalance{
 		employee.WithdrawError()
 		return
@@ -44,8 +44,8 @@ func (employee *Employee)withdrawFromAccount(value int64,waitGroup *sync.WaitGro
 
 func (employee *Employee)AddToAccount(value int64,waitGroup *sync.WaitGroup){
 
-	waitGroup.Add(1)
-	waitGroup.Done()
+	
+	defer waitGroup.Done()
 
 	employee.mutex.Lock()
 	fmt.Println("Locked.Adding to account:",value)
@@ -60,7 +60,7 @@ func (employee *Employee)AddToAccount(value int64,waitGroup *sync.WaitGroup){
 func (employee *Employee)getBalance(){
 
 	employee.mutex.Lock()
-	fmt.Println("current bal:- ",employee.bankBalance)
+	fmt.Println(employee.bankBalance)
 	employee.mutex.Unlock()
 }
 
@@ -74,15 +74,16 @@ func main() {
 
 	}
 
+        waitGroup.Add(5)
+	
+	go (employee1).AddToAccount(4000,&waitGroup)
+	go (employee1).AddToAccount(4000,&waitGroup)
 
-	go (&employee1).AddToAccount(4000,&waitGroup)
-	go (&employee1).AddToAccount(4000,&waitGroup)
 
-
-	go (&employee1).AddToAccount(4000,&waitGroup)
-	go (&employee1).AddToAccount(4000,&waitGroup)
-	go (&employee1).withdrawFromAccount(1000,&waitGroup)
-
+	go (employee1).AddToAccount(4000,&waitGroup)
+	go (employee1).AddToAccount(4000,&waitGroup)
+	go (employee1).withdrawFromAccount(1000,&waitGroup)
+ 
 
 	time.Sleep(time.Second*1)
 
