@@ -9,7 +9,7 @@ import (
 )
 
 func CreateProduct(c *gin.Context){
-	var product Product.Customer
+	var product Product.Product
 	c.BindJSON(&product)
 
 	err := Product.CreateProduct(&product)
@@ -22,7 +22,7 @@ func CreateProduct(c *gin.Context){
 }
 
 func GetProductById(c *gin.Context){
-	var product Product.Customer
+	var product Product.Product
 	c.BindJSON(&product)
 	id := c.Params.ByName("id")
 	err := Product.GetProductById(&product,id)
@@ -33,8 +33,9 @@ func GetProductById(c *gin.Context){
 		c.JSON(http.StatusOK, product)
 	}
 }
+
 func GetAllProduct(c *gin.Context){
-	var product []Product.Customer
+	var product []Product.Product
 	c.BindJSON(&product)
 
 	err := Product.GetAllProducts(&product)
@@ -45,8 +46,10 @@ func GetAllProduct(c *gin.Context){
 		c.JSON(http.StatusOK, product)
 	}
 }
+
+
 func DeleteProduct(c *gin.Context){
-	var product Product.Customer
+	var product Product.Product
 	c.BindJSON(&product)
 	id := c.Params.ByName("id")
 	err := Product.DeleteProduct(&product,id)

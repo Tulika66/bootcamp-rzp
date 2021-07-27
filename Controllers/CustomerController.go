@@ -1,8 +1,9 @@
 package Controllers
 
 import (
-	"bootcamp/commerce/Models/Customer"
 
+	"bootcamp/commerce/Models/Customer"
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -57,4 +58,49 @@ func DeleteCustomer(c *gin.Context){
 		c.JSON(http.StatusOK,customer )
 	}
 }
+
+
+// features : 1. custom view all products
+//            2. view his order history
+//            3. Place an Order
+
+func CustomerViewsProducts(c * gin.Context){
+	GetAllProduct(c)
+}
+
+func ViewOrderHistory(c * gin.Context){
+	id := c.Params.ByName("id")
+	var customer Customer.Customer
+	c.BindJSON(&customer)
+	err := Customer.GetCustomerById(&customer,id)
+	if err != nil {
+		fmt.Println(err.Error())
+		c.JSON(404,"Invalid Customer")
+		c.AbortWithStatus(http.StatusNotFound)
+	} else {
+		stringprint,_:=json.Marshal("Valid Customer. Fetching all orders!")
+		c.JSON(http.StatusOK,string(stringprint) )
+		GetOrdersOfId(c)
+	}
+
+}
+
+func PlaceOrder(c *gin.Context){
+	id := c.Params.ByName("id")
+	var customer Customer.Customer
+	c.BindJSON(&customer)
+	err := Customer.GetCustomerById(&customer,id)
+	if err != nil {
+		fmt.Println(err.Error())
+		c.JSON(404,"Invalid Customer")
+		c.AbortWithStatus(http.StatusNotFound)
+	} else {
+		stringprint,_:=json.Marshal("Valid Customer. Fetching all orders!")
+		c.JSON(http.StatusOK,string(stringprint) )
+		CreateOrder(c)
+	}
+
+
+}
+
 

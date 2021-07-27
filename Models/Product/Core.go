@@ -18,6 +18,7 @@ func GetAllProducts(products *[]Product) (err error) {
 }
 
 func CreateProduct(product *Product)(err error){
+    //Cache.CacheLocal.Set(product.Name,product.ID,cache.NoExpiration)
 	if err :=Config.Db.Create(product).Error;err!=nil{
 		return err
 	}
@@ -49,6 +50,8 @@ func UpdateProduct(product *Product, id string) (err error) {
 
 func DeleteProduct(product *Product, id string) (err error) {
 
+
+	//Cache.CacheLocal.Delete(product.Name)
 	return Config.Db.Transaction(func(tx *gorm.DB) error {
 		tx.Where("id = ?", id).Delete(product)
 
