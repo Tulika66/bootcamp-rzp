@@ -1,5 +1,6 @@
 package Controllers
 
+
 import (
 	"bootcamp/commerce/Models/Order"
 	"fmt"
@@ -67,25 +68,24 @@ func DeleteOrder(c *gin.Context){
 
 func GetOrdersOfId(c *gin.Context){
 
-	var orders []Order.Order
+	var orders *[]Order.Order
+	var ordersReceived *[]Order.Order
+	var err error
 	c.BindJSON(orders)
 
 	id := c.Params.ByName("id")
-	err := Order.GetOrdersOfId(orders,id)
+	ordersReceived,err = Order.GetOrdersOfId(orders,id)
+
 	if err != nil {
 		fmt.Println(err.Error())
 		c.AbortWithStatus(http.StatusNotFound)
 	} else {
-		c.JSON(http.StatusOK, orders)
+		c.JSON(http.StatusOK, ordersReceived)
 	}
 
 
 }
 
-
-func OrderUpdate(c *gin.Context){
-
-}
 
 func GetAllProcessedOrders(c * gin.Context){
 

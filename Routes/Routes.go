@@ -15,7 +15,7 @@ func setupCustomerRoutes(grp1 *gin.RouterGroup){
 	grp1.DELETE("customer/:id", Controllers.DeleteCustomer)
 	//grp1.GET("customer/:id",Controllers.CustomerViewsProducts)
 	grp1.POST("customer/:id", Controllers.PlaceOrder)
-	grp1.GET("customers/history",Controllers.ViewOrderHistory)
+	grp1.GET("customers/:id/history",Controllers.ViewOrderHistory)
 	grp1.GET("customers/viewProducts",Controllers.GetAllProduct)
 
 }

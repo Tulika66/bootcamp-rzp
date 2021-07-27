@@ -1,9 +1,11 @@
 package Order
 
 import (
-	//"bootcamp/commerce/Cache"
 	"bootcamp/commerce/Config"
+	"bootcamp/commerce/Models/OrderProcessor"
 	"bootcamp/commerce/Models/Product"
+	"time"
+
 	//"errors"
 	"fmt"
 	"gorm.io/gorm"
@@ -29,14 +31,30 @@ func CreateOrder(order *Order)(err error){
 		fmt.Println("Invalid Product. Product does not exist!")
 		return err2
 	}
-	if err :=Config.Db.Create(&order).Error;err!=nil{
+
+
+	if err :=Config.Db.Create(order).Error;err!=nil{
 				return err
 			}
 
-   return nil
+	OrderProcessor.Queue=append(OrderProcessor.Queue,order.ID)
+	fmt.Println("Order appended to queue.")
+    if len(OrderProcessor.Queue)==1{
+    	go OrderProcessor.QueueAlloter()
+	}
+	if OrderProcessor.ExecutionQueue.Front()==nil{
+		go OrderProcessor.StartQueueProcessing()
+	}
+	OrderProcessor.Mutex.Lock()
+	OrderProcessor.OrderTimeMap[order.ID]=time.Now()
+	OrderProcessor.Mutex.Unlock()
+
+
+
+    return nil
     //_,found:=Cache.CacheLocal.Get(order.ProductName)
     //if found{
-	//	if err :=Config.Db.Create(&order).Error;err!=nil{
+	//	if err :=Config.Db.Create(order).Error;err!=nil{
 	//		return err
 	//	}
 	//	return nil
@@ -83,20 +101,29 @@ func DeleteOrder(order *Order, id string) (err error) {
 	//return nil
 }
 
-func GetOrdersOfId(orders []Order,id string)(err error){
+func GetOrdersOfId(orders *[]Order,id string)(orderFound*[]Order ,err error){
 
-	if err :=Config.Db.Preload(clause.Associations).Where("CustomerId = ?",id).Find(orders).Error;err!=nil{
+	if err :=Config.Db.Preload(clause.Associations).Where("customer_id = ?",id).Find(&orders).Error;err!=nil{
+		return nil,err
+	}
+	return orders,nil
+
+}
+
+func GetOrdersProcessed(orders []Order)(err error){
+
+	if err :=Config.Db.Preload(clause.Associations).Where("status = ?",Executed).Find(&orders).Error;err!=nil{
 		return err
 	}
 	return nil
 
 }
 
-func GetOrdersProcessed(orders []Order)(err error){
-
-	if err :=Config.Db.Preload(clause.Associations).Where("status = ?",Executed).Find(orders).Error;err!=nil{
+func UpdateOrderStatus(id uint)error{
+	var order Order
+	if err :=Config.Db.Preload(clause.Associations).Where("id = ?",id).First(&order).Error;err!=nil{
 		return err
 	}
-	return nil
-
+	order.Status="Executed"
+   return nil
 }

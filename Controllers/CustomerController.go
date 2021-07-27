@@ -78,7 +78,7 @@ func ViewOrderHistory(c * gin.Context){
 		c.JSON(404,"Invalid Customer")
 		c.AbortWithStatus(http.StatusNotFound)
 	} else {
-		stringprint,_:=json.Marshal("Valid Customer. Fetching all orders!")
+		stringprint,_:=json.Marshal("\n Valid Customer. Fetching all orders!\n")
 		c.JSON(http.StatusOK,string(stringprint) )
 		GetOrdersOfId(c)
 	}
